@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #764ba2;
+        }
+        .weather-info {
+            margin-top: 30px;
+            display: none;
+        }
+        .weather-info.show {
+            display: block;
+        }
+        .city-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .weather-detail {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .temperature {
+            font-size: 48px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .error {
+            color: red;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌤️ Weather App</h1>
+        <input type="text" id="cityInput" placeholder="Enter city name" value="Dallas">
+        <button onclick="fetchWeather()">Get Weather</button>
+        
+        <div id="weatherInfo" class="weather-info">
+            <div class="city-name" id="cityName"></div>
+            <div class="temperature" id="temperature"></div>
+            <div class="weather-detail">Feels Like: <span id="feelsLike"></span></div>
+            <div class="weather-detail">Condition: <span id="condition"></span></div>
+        </div>
+        
+        <div id="error" class="error"></div>
+    </div>
+
+    <script>
+        async function fetchWeather() {
+            const city = document.getElementById('cityInput').value;
+            const errorDiv = document.getElementById('error');
+            errorDiv.innerText = '';
+
+            try {
+                const response = await fetch(`/weather?city=${city}`);
+                if (!response.ok) throw new Error('City not found');
+                
+                const data = await response.json();
+                
+                document.getElementById('cityName').innerText = data.city;
+                document.getElementById('temperature').innerText = `${data.temperature_f}°F`;
+                document.getElementById('feelsLike').innerText = `${data.feels_like_f}°F`;
+                document.getElementById('condition').innerText = data.condition;
+                document.getElementById('weatherInfo').classList.add('show');
+            } catch (error) {
+                errorDiv.innerText = `Error: ${error.message}`;
+                document.getElementById('weatherInfo').classList.remove('show');
+            }
+        }
+
+        // Fetch weather on Enter key
+        document.getElementById('cityInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') fetchWeather();
+        });
+
+        // Load Dallas weather on page load
+        fetchWeather();
+    </script>
+</body>
+</html>
